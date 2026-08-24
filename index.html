@@ -721,11 +721,13 @@ document.getElementById('searchForm').addEventListener('submit', (e) => {
     mapsUrl: mapsLink(startCity, item.lat, item.lng)
   }));
 
-  // Complément si moins de 30 résultats après filtrage : liens de recherche généraux
+  // Complément si moins de 30 résultats après filtrage : liens de recherche généraux et spécialisés
   if(cards.length < 30){
     const destination = countries.length ? countries.join(' ') : 'Europe';
     const typeLabel = types.length ? types.join(' ') : 'vacances famille';
     const styleLabel = styles.length ? styles.join(' ') : '';
+    const gQuery = (extra) => `https://www.google.com/search?q=${encodeURIComponent([extra, destination, 'famille', `${totalPersons} personnes`, dateStart && dateEnd ? `${dateStart} au ${dateEnd}` : '', budget ? `budget ${budget}€` : ''].filter(Boolean).join(' '))}`;
+
     const bkParams = new URLSearchParams();
     bkParams.set('ss', `${typeLabel} ${destination}`.trim());
     if(dateStart) bkParams.set('checkin', dateStart);
@@ -733,10 +735,35 @@ document.getElementById('searchForm').addEventListener('submit', (e) => {
     bkParams.set('group_adults', adults);
     bkParams.set('group_children', kids.length);
     kids.forEach(age => bkParams.append('age', age));
+
+    const abParams = new URLSearchParams();
+    abParams.set('adults', adults);
+    if(kids.length) abParams.set('children', kids.length);
+    if(dateStart) abParams.set('checkin', dateStart);
+    if(dateEnd) abParams.set('checkout', dateEnd);
+
+    const mk = (name, type, desc, url) => ({ name, type, desc, rating:null, ratingScore:-1, distance:null, distanceValue:Infinity, price:'Prix affichés en direct sur le site', priceValue:Infinity, relevanceOrder:99, url, mapsUrl:null });
+
     const fillers = [
-      { name:'Booking.com', type:'Recherche générale · Hôtels, campings, résidences', desc:'Recherche pré-remplie avec vos dates et votre groupe.', rating:null, ratingScore:-1, distance:null, distanceValue:Infinity, price:'Prix affichés en direct sur le site', priceValue:Infinity, relevanceOrder:99, url:`https://www.booking.com/searchresults.html?${bkParams.toString()}`, mapsUrl:null },
-      { name:'Recherche Google élargie', type:'Recherche générale · Toutes options', desc:'Combine tous vos critères en une requête.', rating:null, ratingScore:-1, distance:null, distanceValue:Infinity, price:'—', priceValue:Infinity, relevanceOrder:100, url:`https://www.google.com/search?q=${encodeURIComponent([typeLabel, styleLabel, destination, 'famille', `${totalPersons} personnes`, dateStart && dateEnd ? `${dateStart} au ${dateEnd}` : '', budget ? `budget ${budget}€` : ''].filter(Boolean).join(' '))}`, mapsUrl:null }
+      mk('Booking.com', 'Recherche générale · Hôtels, campings, résidences', 'Recherche pré-remplie avec vos dates et votre groupe.', `https://www.booking.com/searchresults.html?${bkParams.toString()}`),
+      mk('Airbnb', 'Recherche générale · Locations & gîtes', 'Adultes et enfants déjà renseignés.', `https://www.airbnb.fr/s/${encodeURIComponent(destination)}/homes?${abParams.toString()}`),
+      mk('Recherche Google élargie', 'Recherche générale · Toutes options', 'Combine tous vos critères en une requête.', gQuery(`${typeLabel} ${styleLabel}`)),
+      mk('TripAdvisor', 'Recherche générale · Avis vérifiés', 'Classements et avis voyageurs pour affiner.', gQuery(`site:tripadvisor.fr ${typeLabel} avis`)),
+      mk('HomeToGo', 'Recherche générale · Comparateur locations', 'Compare plusieurs plateformes de location en une fois.', gQuery(`site:hometogo.fr ${typeLabel}`)),
     ];
+    if(!types.length || types.includes('camping')){
+      fillers.push(mk('ACSI Campings', 'Comparateur · Campings', 'Comparateur de campings en Europe, filtrable par équipements famille.', gQuery('site:acsi.eu camping ' + styleLabel)));
+    }
+    if(!types.length || types.includes('parc de vacances')){
+      fillers.push(mk('Center Parcs / Sunparks', 'Recherche · Parcs de vacances', 'Parcs avec espace aquatique et animations enfants.', gQuery('Center Parcs Sunparks')));
+    }
+    if(!types.length || types.includes('gîte / location')){
+      fillers.push(mk('Gîtes de France', 'Recherche · Gîtes', 'Locations et gîtes familiaux, souvent avec jardin ou piscine.', gQuery('gîtes de France famille piscine')));
+    }
+    if(!types.length || types.includes('club vacances')){
+      fillers.push(mk('Belambra Clubs', 'Recherche · Clubs vacances', 'Clubs vacances avec club enfants et animations.', gQuery('Belambra Clubs')));
+    }
+
     while(cards.length < 30 && fillers.length){
       cards.push(fillers.shift());
     }
