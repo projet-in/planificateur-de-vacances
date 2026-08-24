@@ -422,7 +422,7 @@
       <h2>Suggestions trouvées</h2>
       <div class="results-controls">
         <select id="sortMode">
-          <option value="relevance">Trier : pertinence</option>
+          <option value="relevance">Trier : note (défaut)</option>
           <option value="distance">Trier : distance</option>
           <option value="rating">Trier : note</option>
           <option value="price">Trier : prix</option>
@@ -527,6 +527,8 @@ window.addEventListener('error', (e) => {
 // price / rating = données trouvées en recherche ; sinon null => "à vérifier sur le site".
 // lat/lng = coordonnées approximatives (pour calcul de distance à vol d'oiseau).
 const destinations = [
+  { name:"Cap'Fun France — toutes les destinations", type:'camping', country:'France', region:'217 campings, toutes régions', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air','activités sportives'], lat:46.6, lng:2.5,
+    desc:"Catalogue complet du groupe : filtrez vous-même par région, prix et équipements sur leur site officiel.", price:null, rating:'8,8/10 sur plus de 300 000 avis (moyenne du groupe)', directUrl:'https://www.capfun.com/camping-france/camping_enfants-france-recherche-FR.html' },
   { name:'Camping Mer et Soleil (Cap\'Fun)', type:'camping', country:'France', region:'Cap d\'Agde, Occitanie', styles:['fun / animations','plaine de jeux / aquapark'], lat:43.29, lng:3.51,
     desc:"Spacebowl, toboggans multipistes, karting enfant, Marque de l'année 2026.", price:null, rating:'9,1/10 sur 2 988 avis vérifiés', site:'Capfun Mer et Soleil Cap d\'Agde' },
   { name:'Camping Imbours (Cap\'Fun)', type:'camping', country:'France', region:'Ardèche', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air'], lat:44.66, lng:4.48,
@@ -537,6 +539,12 @@ const destinations = [
     desc:"Lagon artificiel, 2 zones aquatiques, nombreux jeux pour enfants.", price:null, rating:'8,9/10 sur 4 210 avis vérifiés', site:'Capfun Atlantique Parc La Palmyre' },
   { name:'Camping Parc de Paris (Cap\'Fun)', type:'camping', country:'France', region:'Villevaudé, Île-de-France', styles:['fun / animations','plaine de jeux / aquapark'], lat:48.91, lng:2.69,
     desc:"Toboggans Spacebowl, mini-accrobranche, à 20 km de Disneyland Paris.", price:null, rating:'8,9/10 (avis vérifiés)', site:'Capfun Parc de Paris Villevaudé' },
+  { name:"Camping L'Hirondelle (Cap'Fun)", type:'camping', country:'Belgique', region:'Oteppe, Ardennes (province de Liège)', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air'], lat:50.57, lng:5.16,
+    desc:"Château-ferme du 18e, centre aquatique avec toboggans de 35 m, plaine de jeux, à 40 km de Liège.", price:null, rating:null, site:"Capfun L'Hirondelle Oteppe" },
+  { name:'Camping Le Pachy (Cap\'Fun)', type:'camping', country:'Belgique', region:'Fosses-la-Ville, Namur', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air'], lat:50.35, lng:4.68,
+    desc:"Parc aquatique avec toboggans, karting à pédales, mini-golf, à 1 km du lac de Bambois.", price:null, rating:'8,0/10 (avis clients)', site:'Capfun Le Pachy Fosses-la-Ville' },
+  { name:'Camping Fort Bedmar (Cap\'Fun)', type:'camping', country:'Belgique', region:'Sint-Gillis-Waas, Flandre-Orientale', styles:['fun / animations','plaine de jeux / aquapark'], lat:51.27, lng:4.11,
+    desc:"Piscine extérieure chauffée, pataugeoire, étang de pêche, à la frontière avec les Pays-Bas.", price:null, rating:'8,5/10 (avis clients)', site:'Capfun Fort Bedmar Sint-Gillis-Waas' },
   { name:'Center Parcs De Vossemeren', type:'parc de vacances', country:'Belgique', region:'Limbourg', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air'], lat:51.13, lng:5.42,
     desc:"Aqua Mundo avec toboggans et rivière sauvage, plus de 120 activités.", price:null, rating:'4,3/5 (Google)', site:'centerparcs.be De Vossemeren' },
   { name:'Center Parcs Erperheide', type:'parc de vacances', country:'Belgique', region:'Limbourg', styles:['fun / animations','plaine de jeux / aquapark','activités sportives'], lat:51.12, lng:5.40,
@@ -619,6 +627,7 @@ function mapsLink(startCity, lat, lng){
 }
 
 function buildLink(item, dateStart, dateEnd, totalPersons){
+  if(item.directUrl) return item.directUrl;
   const words = [item.site, dateStart && dateEnd ? `du ${dateStart} au ${dateEnd}` : '', `${totalPersons} personnes`, 'réservation prix'].filter(Boolean).join(' ');
   return `https://www.google.com/search?q=${encodeURIComponent(words)}`;
 }
@@ -698,8 +707,11 @@ document.getElementById('searchForm').addEventListener('submit', (e) => {
     (!maxDistance || d.distanceKm <= maxDistance)
   );
 
-  // Tri par défaut (pertinence) : style demandé en priorité, puis distance croissante
+  // Tri par défaut : les mieux notés en premier, puis style demandé, puis distance croissante
   matches.sort((a,b) => {
+    const aRating = parseRatingScore(a.rating);
+    const bRating = parseRatingScore(b.rating);
+    if(aRating !== bRating) return bRating - aRating;
     const aMatch = styles.length && a.styles.some(s => styles.includes(s)) ? 1 : 0;
     const bMatch = styles.length && b.styles.some(s => styles.includes(s)) ? 1 : 0;
     if(aMatch !== bMatch) return bMatch - aMatch;
