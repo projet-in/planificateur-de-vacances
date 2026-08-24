@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carnet de recherche — Vacances en famille</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root{
+    --ink:#1B4B43;
+    --ink-light:#2E6B5E;
+    --paper:#F3ECDD;
+    --paper-dark:#E7DAC0;
+    --cream:#FBF8F1;
+    --coral:#E0602A;
+    --mustard:#C89B3C;
+    --charcoal:#2B2620;
+    --charcoal-soft:#5B5347;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--charcoal);
+    font-family:'Inter',sans-serif;
+    padding:0 0 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 0;}
+
+  header{margin-bottom:28px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--coral);
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(30px,6vw,42px);
+    line-height:1.05;
+    margin:0 0 10px;
+    color:var(--ink);
+  }
+  .sub{color:var(--charcoal-soft);font-size:15px;max-width:52ch;line-height:1.5;}
+
+  /* Boarding-pass style traveler summary */
+  .pass{
+    background:var(--cream);
+    border:1px solid var(--paper-dark);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-top:22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .pass::before{
+    content:'';
+    position:absolute;
+    left:78%;
+    top:0;bottom:0;
+    width:0;
+    border-left:2px dashed var(--paper-dark);
+  }
+  .pass-main{font-family:'Fraunces',serif;font-size:19px;color:var(--ink);}
+  .pass-main b{font-weight:700;}
+  .pass-count{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:28px;
+    font-weight:600;
+    color:var(--coral);
+    text-align:center;
+    min-width:70px;
+  }
+  .pass-count span{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--charcoal-soft);font-family:'Inter',sans-serif;font-weight:600;margin-top:2px;}
+
+  /* Form */
+  form{margin-top:30px;}
+  .card{
+    background:var(--cream);
+    border:1px solid var(--paper-dark);
+    border-radius:var(--radius);
+    padding:22px;
+    margin-bottom:16px;
+  }
+  .card h2{
+    font-family:'Fraunces',serif;
+    font-size:17px;
+    margin:0 0 14px;
+    color:var(--ink);
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2 .n{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    background:var(--ink);
+    color:var(--cream);
+    width:20px;height:20px;
+    border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  label{font-size:13px;font-weight:600;color:var(--charcoal-soft);display:block;margin-bottom:6px;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;}
+  .row > div{flex:1;min-width:140px;}
+  input[type=date], input[type=number], input[type=text]{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--paper-dark);
+    border-radius:8px;
+    background:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--charcoal);
+  }
+  input:focus{outline:2px solid var(--ink-light);outline-offset:1px;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--paper-dark);
+    background:#fff;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--charcoal-soft);
+    transition:.15s;
+    user-select:none;
+  }
+  .chip:hover{border-color:var(--ink-light);}
+  .chip.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .chip.remove::after{content:' ×';font-weight:700;}
+
+  .kids-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+  .kid-pill{
+    display:flex;align-items:center;gap:6px;
+    background:#fff;border:1px solid var(--paper-dark);
+    border-radius:8px;padding:6px 6px 6px 12px;
+  }
+  .kid-pill span{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--charcoal-soft);}
+  .kid-pill input{width:52px;padding:4px 6px;border:none;background:transparent;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;}
+  .kid-pill button{
+    border:none;background:var(--paper);border-radius:6px;
+    width:22px;height:22px;cursor:pointer;color:var(--coral);font-weight:700;
+  }
+  .add-btn{
+    border:1px dashed var(--paper-dark);
+    background:transparent;
+    border-radius:8px;
+    padding:7px 14px;
+    font-size:13px;font-weight:600;
+    color:var(--ink-light);
+    cursor:pointer;
+  }
+  .add-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px;}
+
+  .toggle-row{display:flex;gap:8px;margin-top:8px;}
+  .toggle{
+    flex:1;padding:9px;border-radius:8px;border:1px solid var(--paper-dark);
+    background:#fff;font-size:13px;font-weight:600;text-align:center;cursor:pointer;color:var(--charcoal-soft);
+  }
+  .toggle.active{background:var(--mustard);border-color:var(--mustard);color:#fff;}
+
+  .submit-btn{
+    width:100%;
+    padding:16px;
+    background:var(--coral);
+    color:#fff;
+    border:none;
+    border-radius:var(--radius);
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:6px;
+    transition:.15s;
+  }
+  .submit-btn:hover{background:#c94f1f;}
+  .submit-btn:disabled{background:var(--paper-dark);color:var(--charcoal-soft);cursor:default;}
+
+  /* Loading */
+  #loading{display:none;text-align:center;padding:40px 0 10px;}
+  .compass{
+    width:44px;height:44px;margin:0 auto 14px;
+    border:3px solid var(--paper-dark);
+    border-top-color:var(--coral);
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #loading p{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--charcoal-soft);}
+
+  /* Results */
+  #results{margin-top:34px;}
+  #results h2{
+    font-family:'Fraunces',serif;font-size:22px;color:var(--ink);margin-bottom:16px;
+  }
+  .grid{display:grid;grid-template-columns:1fr;gap:18px;}
+  @media(min-width:640px){.grid{grid-template-columns:1fr 1fr;}}
+
+  .postcard{
+    background:var(--cream);
+    border:1.5px dashed var(--paper-dark);
+    border-radius:10px;
+    padding:18px;
+    position:relative;
+    display:flex;flex-direction:column;
+    min-height:180px;
+  }
+  .stamp{
+    position:absolute;top:12px;right:12px;
+    width:60px;height:60px;
+    border:2px dashed var(--coral);
+    border-radius:50%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transform:rotate(8deg);
+    background:rgba(224,96,42,0.06);
+  }
+  .stamp b{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--coral);line-height:1.1;}
+  .stamp small{font-size:8px;color:var(--coral);text-transform:uppercase;letter-spacing:.05em;}
+
+  .pc-type{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--ink-light);font-weight:600;margin-bottom:6px;
+  }
+  .pc-name{font-family:'Fraunces',serif;font-size:19px;color:var(--ink);margin:0 0 4px;line-height:1.15;}
+  .pc-loc{font-size:12.5px;color:var(--charcoal-soft);margin-bottom:10px;}
+  .pc-desc{font-size:13.5px;line-height:1.5;color:var(--charcoal);flex:1;}
+  .pc-note{font-size:13px;color:var(--ink);font-weight:700;margin-top:10px;background:var(--paper);padding:6px 10px;border-radius:6px;}
+  .pc-rating{font-size:12.5px;color:var(--mustard);font-weight:700;margin-top:8px;}
+  .pc-distance{font-size:12.5px;color:var(--charcoal-soft);margin-top:4px;}
+  .pc-link{
+    margin-top:14px;
+    display:inline-block;
+    font-size:13px;font-weight:700;
+    color:#fff;background:var(--ink);
+    padding:9px 14px;border-radius:7px;text-decoration:none;
+    text-align:center;
+  }
+  .pc-link:hover{background:var(--ink-light);}
+
+  #error{
+    display:none;
+    background:#fff3ec;border:1px solid var(--coral);
+    color:#8a3417;padding:14px 16px;border-radius:10px;
+    font-size:13.5px;margin-top:20px;
+  }
+
+  .results-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .results-header h2{margin:0;}
+  .results-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  #sortMode{
+    padding:8px 10px;border-radius:8px;border:1px solid var(--paper-dark);
+    background:#fff;font-size:12.5px;font-weight:600;color:var(--charcoal-soft);font-family:'Inter',sans-serif;
+  }
+  .print-btn{
+    padding:8px 14px;border-radius:8px;border:1px solid var(--ink);
+    background:#fff;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;
+  }
+  .print-btn:hover{background:var(--ink);color:#fff;}
+
+  .pc-links{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+  .pc-link{margin-top:0;}
+  .pc-link-secondary{background:transparent;border:1px solid var(--ink);color:var(--ink);}
+  .pc-link-secondary:hover{background:var(--ink);color:#fff;}
+
+  @media print{
+    form, .pass, .results-controls, #error{display:none !important;}
+    body{background:#fff;}
+    .postcard{break-inside:avoid;border:1px solid #999;}
+    .grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Carnet de recherche</div>
+    <h1>Où part la famille&nbsp;?</h1>
+    <p class="sub">Indiquez vos critères, l'appli génère des liens de recherche prêts à l'emploi vers Booking.com, Airbnb et des comparateurs spécialisés — préremplis avec vos dates, votre groupe et votre budget.</p>
+
+    <div class="pass">
+      <div class="pass-main"><b id="passSummary">2 adultes · 5 enfants</b><br><span style="font-size:13px;color:var(--charcoal-soft);">composition modifiable ci-dessous</span></div>
+      <div class="pass-count" id="passTotal">7<span>voyageurs</span></div>
+    </div>
+  </header>
+
+  <form id="searchForm">
+
+    <div class="card">
+      <h2><span class="n">1</span> Dates</h2>
+      <div class="row">
+        <div>
+          <label for="dateStart">Départ</label>
+          <input type="date" id="dateStart">
+        </div>
+        <div>
+          <label for="dateEnd">Retour</label>
+          <input type="date" id="dateEnd">
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--charcoal-soft);margin:10px 0 0;">Laissez vide si les dates sont flexibles.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">2</span> Type de séjour</h2>
+      <div class="chips" id="typeChips">
+        <div class="chip" data-val="camping">Camping</div>
+        <div class="chip" data-val="hôtel">Hôtel</div>
+        <div class="chip" data-val="parc de vacances">Parc de vacances</div>
+        <div class="chip" data-val="gîte / location">Gîte / location</div>
+        <div class="chip" data-val="club vacances">Club vacances</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">3</span> Pays</h2>
+      <div class="chips" id="countryChips">
+        <div class="chip" data-val="Belgique">Belgique</div>
+        <div class="chip" data-val="France">France</div>
+        <div class="chip" data-val="Pays-Bas">Pays-Bas</div>
+        <div class="chip" data-val="Allemagne">Allemagne</div>
+        <div class="chip" data-val="Espagne">Espagne</div>
+        <div class="chip" data-val="Italie">Italie</div>
+        <div class="chip" data-val="Portugal">Portugal</div>
+        <div class="chip" data-val="Croatie">Croatie</div>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <div>
+          <input type="text" id="countryOther" placeholder="Autre pays…">
+        </div>
+        <button type="button" class="add-btn" id="addCountry">+ Ajouter</button>
+      </div>
+      <p style="font-size:12px;color:var(--charcoal-soft);margin:10px 0 0;">Aucun pays sélectionné = toute l'Europe.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">4</span> Style de vacances</h2>
+      <div class="chips" id="styleChips">
+        <div class="chip" data-val="zen / détente">Zen / détente</div>
+        <div class="chip" data-val="familial">Familial</div>
+        <div class="chip" data-val="fun / animations">Fun / animations</div>
+        <div class="chip" data-val="activités sportives">Activités sportives</div>
+        <div class="chip" data-val="plaine de jeux / aquapark">Plaine de jeux / aquapark</div>
+        <div class="chip" data-val="nature / plein air">Nature / plein air</div>
+        <div class="chip" data-val="culture / découverte">Culture / découverte</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">5</span> Participants</h2>
+      <div class="row">
+        <div>
+          <label for="adults">Adultes</label>
+          <input type="number" id="adults" min="1" max="10" value="2">
+        </div>
+      </div>
+      <label style="margin-top:14px;">Enfants (âge en années)</label>
+      <div class="kids-list" id="kidsList"></div>
+      <button type="button" class="add-btn" id="addKid">+ Ajouter un enfant</button>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">6</span> Point de départ &amp; distance</h2>
+      <div class="row">
+        <div>
+          <label for="startCity">Ville de départ</label>
+          <select id="startCity">
+            <option value="Charleroi" selected>Charleroi</option>
+            <option value="Bruxelles">Bruxelles</option>
+            <option value="Namur">Namur</option>
+            <option value="Mons">Mons</option>
+            <option value="Liège">Liège</option>
+            <option value="Tournai">Tournai</option>
+            <option value="Anvers">Anvers</option>
+            <option value="Gand">Gand</option>
+            <option value="Lille">Lille</option>
+            <option value="Paris">Paris</option>
+          </select>
+        </div>
+        <div>
+          <label for="maxDistance">Distance max (km, aller)</label>
+          <input type="number" id="maxDistance" min="0" step="10" placeholder="ex : 300">
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--charcoal-soft);margin:10px 0 0;">Distance à vol d'oiseau majorée de 30% pour approcher un trajet routier réel. Laissez vide pour ne pas filtrer.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">7</span> Budget</h2>
+      <div class="row">
+        <div>
+          <label for="budget">Montant (€)</label>
+          <input type="number" id="budget" min="0" step="50" placeholder="ex : 1500">
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle active" data-val="total">Budget total</div>
+        <div class="toggle" data-val="perpers">Par personne</div>
+      </div>
+      <p style="font-size:12px;color:var(--charcoal-soft);margin:10px 0 0;">Laissez vide si le budget est ouvert.</p>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">Générer les liens de recherche</button>
+  </form>
+
+  <div id="error"></div>
+
+  <div id="results" style="display:none;">
+    <div class="results-header">
+      <h2>Suggestions trouvées</h2>
+      <div class="results-controls">
+        <select id="sortMode">
+          <option value="relevance">Trier : pertinence</option>
+          <option value="distance">Trier : distance</option>
+          <option value="rating">Trier : note</option>
+          <option value="price">Trier : prix</option>
+        </select>
+        <button type="button" id="printBtn" class="print-btn">🖨️ Imprimer / PDF</button>
+      </div>
+    </div>
+    <div class="grid" id="resultsGrid"></div>
+  </div>
+
+</div>
+
+<script>
+const defaultKids = [16,11,8,8,4];
+let selectedTypes = new Set();
+let selectedCountries = new Set();
+let selectedStyles = new Set();
+let budgetMode = 'total';
+
+function renderKids(){
+  const list = document.getElementById('kidsList');
+  list.innerHTML = '';
+  defaultKids.forEach((age, i) => {
+    const pill = document.createElement('div');
+    pill.className = 'kid-pill';
+    pill.innerHTML = `<span>enfant ${i+1}</span><input type="number" min="0" max="17" value="${age}" data-idx="${i}"><button type="button" data-idx="${i}">×</button>`;
+    list.appendChild(pill);
+  });
+  list.querySelectorAll('button').forEach(b => b.onclick = () => {
+    defaultKids.splice(+b.dataset.idx, 1);
+    renderKids();
+    updatePass();
+  });
+  list.querySelectorAll('input').forEach(inp => inp.oninput = () => {
+    defaultKids[+inp.dataset.idx] = +inp.value;
+  });
+}
+document.getElementById('addKid').onclick = () => { defaultKids.push(8); renderKids(); updatePass(); };
+renderKids();
+
+document.getElementById('adults').oninput = updatePass;
+function updatePass(){
+  const adults = +document.getElementById('adults').value || 0;
+  const kids = defaultKids.length;
+  document.getElementById('passSummary').textContent = `${adults} adulte${adults>1?'s':''} · ${kids} enfant${kids>1?'s':''}`;
+  document.getElementById('passTotal').innerHTML = `${adults+kids}<span>voyageurs</span>`;
+}
+updatePass();
+
+document.getElementById('typeChips').addEventListener('click', e => {
+  if(!e.target.classList.contains('chip')) return;
+  e.target.classList.toggle('active');
+  const v = e.target.dataset.val;
+  selectedTypes.has(v) ? selectedTypes.delete(v) : selectedTypes.add(v);
+});
+
+document.getElementById('styleChips').addEventListener('click', e => {
+  if(!e.target.classList.contains('chip')) return;
+  e.target.classList.toggle('active');
+  const v = e.target.dataset.val;
+  selectedStyles.has(v) ? selectedStyles.delete(v) : selectedStyles.add(v);
+});
+
+function addCountryChip(val, active=true){
+  const c = document.getElementById('countryChips');
+  const chip = document.createElement('div');
+  chip.className = 'chip' + (active ? ' active' : '');
+  chip.dataset.val = val;
+  chip.textContent = val;
+  c.appendChild(chip);
+  if(active) selectedCountries.add(val);
+}
+document.getElementById('countryChips').addEventListener('click', e => {
+  if(!e.target.classList.contains('chip')) return;
+  e.target.classList.toggle('active');
+  const v = e.target.dataset.val;
+  selectedCountries.has(v) ? selectedCountries.delete(v) : selectedCountries.add(v);
+});
+document.getElementById('addCountry').onclick = () => {
+  const inp = document.getElementById('countryOther');
+  const v = inp.value.trim();
+  if(!v) return;
+  addCountryChip(v, true);
+  inp.value = '';
+};
+
+document.querySelectorAll('.toggle').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.toggle').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    budgetMode = t.dataset.val;
+  };
+});
+
+window.addEventListener('error', (e) => {
+  const errorBox = document.getElementById('error');
+  errorBox.textContent = "Erreur technique : " + e.message;
+  errorBox.style.display = 'block';
+});
+
+// Base de destinations réelles (classées par notoriété/avis), issues de recherche.
+// price / rating = données trouvées en recherche ; sinon null => "à vérifier sur le site".
+// lat/lng = coordonnées approximatives (pour calcul de distance à vol d'oiseau).
+const destinations = [
+  { name:'Camping Mer et Soleil (Cap\'Fun)', type:'camping', country:'France', region:'Cap d\'Agde, Occitanie', styles:['fun / animations','plaine de jeux / aquapark'], lat:43.29, lng:3.51,
+    desc:"Spacebowl, toboggans multipistes, karting enfant, Marque de l'année 2026.", price:null, rating:'9,1/10 sur 2 988 avis vérifiés', site:'Capfun Mer et Soleil Cap d\'Agde' },
+  { name:'Camping Imbours (Cap\'Fun)', type:'camping', country:'France', region:'Ardèche', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air'], lat:44.66, lng:4.48,
+    desc:"Aires de jeux château à toboggans, spectacles, l'un des Plus Beaux Campings de France.", price:null, rating:'9,0/10 sur 9 013 avis vérifiés', site:'Capfun Imbours Ardèche' },
+  { name:'Camping Dune Fleurie (Cap\'Fun)', type:'camping', country:'France', region:'Quend-Plage, Hauts-de-France', styles:['fun / animations','plaine de jeux / aquapark'], lat:50.27, lng:1.63,
+    desc:"Île aux Jeux Aquatiques, mini-ferme, lauréat ACSI Award 2026 \"Meilleur camping pour enfant\".", price:null, rating:'8,9/10 sur 13 561 avis vérifiés', site:'Capfun Dune Fleurie Quend-Plage' },
+  { name:'Camping Atlantique Parc (Cap\'Fun)', type:'camping', country:'France', region:'La Palmyre, Charente-Maritime', styles:['fun / animations','plaine de jeux / aquapark'], lat:45.68, lng:-1.14,
+    desc:"Lagon artificiel, 2 zones aquatiques, nombreux jeux pour enfants.", price:null, rating:'8,9/10 sur 4 210 avis vérifiés', site:'Capfun Atlantique Parc La Palmyre' },
+  { name:'Camping Parc de Paris (Cap\'Fun)', type:'camping', country:'France', region:'Villevaudé, Île-de-France', styles:['fun / animations','plaine de jeux / aquapark'], lat:48.91, lng:2.69,
+    desc:"Toboggans Spacebowl, mini-accrobranche, à 20 km de Disneyland Paris.", price:null, rating:'8,9/10 (avis vérifiés)', site:'Capfun Parc de Paris Villevaudé' },
+  { name:'Center Parcs De Vossemeren', type:'parc de vacances', country:'Belgique', region:'Limbourg', styles:['fun / animations','plaine de jeux / aquapark','nature / plein air'], lat:51.13, lng:5.42,
+    desc:"Aqua Mundo avec toboggans et rivière sauvage, plus de 120 activités.", price:null, rating:'4,3/5 (Google)', site:'centerparcs.be De Vossemeren' },
+  { name:'Center Parcs Erperheide', type:'parc de vacances', country:'Belgique', region:'Limbourg', styles:['fun / animations','plaine de jeux / aquapark','activités sportives'], lat:51.12, lng:5.40,
+    desc:"Le plus grand Aqua Mundo de Belgique, squash, escalade, bowling.", price:null, rating:'~4/5 (TripAdvisor, un peu plus sur Google)', site:'centerparcs.be Erperheide' },
+  { name:'Center Parcs Terhills Resort', type:'parc de vacances', country:'Belgique', region:'Limbourg', styles:['zen / détente','nature / plein air'], lat:50.97, lng:5.74,
+    desc:"Le mieux noté de Belgique, cadre lac, mais peu d'animations enfants et pas de toboggans.", price:'Tarif premium (plus élevé que les autres Center Parcs)', rating:'4,5/5 (Google & TripAdvisor)', site:'centerparcs.be Terhills' },
+  { name:'Sunparks Oostduinkerke aan Zee', type:'parc de vacances', country:'Belgique', region:'Côte belge', styles:['fun / animations','plaine de jeux / aquapark'], lat:51.11, lng:2.68,
+    desc:"Aquafun avec toboggan \"black hole\", Kids World, Plopsaland à 15 min.", price:'Dès environ 148€ en semaine / 274€ le week-end (hors saison, indicatif)', rating:'3,5/5 TripAdvisor · 3,7/5 Google', site:'Sunparks Oostduinkerke aan Zee' },
+  { name:'Sunparks Kempense Meren', type:'parc de vacances', country:'Belgique', region:'Campine (frontière NL)', styles:['fun / animations','plaine de jeux / aquapark','zen / détente'], lat:51.29, lng:5.15,
+    desc:"Parc aquatique intérieur chauffé toute l'année, espace bien-être.", price:null, rating:null, site:'Sunparks Kempense Meren' },
+  { name:'Camping Village de la Guyonnière', type:'camping', country:'France', region:'Vendée', styles:['fun / animations','plaine de jeux / aquapark'], lat:46.83, lng:-1.28,
+    desc:"Parc aquatique entièrement rénové, poney, ferme pédagogique.", price:null, rating:'9/10 (avis clients)', site:'Camping Village de la Guyonnière Vendée' },
+  { name:'Domaine des Ormes', type:'camping', country:'France', region:'Bretagne', styles:['fun / animations','plaine de jeux / aquapark','activités sportives'], lat:48.44, lng:-1.83,
+    desc:"5★, grand parc aquatique, centre équestre, golf, parc d'aventures, château.", price:null, rating:null, site:'Camping Domaine des Ormes Bretagne' },
+  { name:'Camping Les Brunelles', type:'camping', country:'France', region:'Vendée', styles:['fun / animations','plaine de jeux / aquapark'], lat:46.68, lng:-1.95,
+    desc:"5★, parc aquatique parmi les plus impressionnants de la région.", price:null, rating:null, site:'Camping Les Brunelles Vendée' },
+  { name:'Camping La Rive', type:'camping', country:'France', region:'Landes (Biscarrosse)', styles:['fun / animations','plaine de jeux / aquapark'], lat:44.47, lng:-1.17,
+    desc:"5★ le mieux noté du réseau Tohapi, piscines intérieure et extérieure.", price:null, rating:null, site:'Camping La Rive Biscarrosse' },
+  { name:'Domaine de la Dragonnière', type:'camping', country:'France', region:'Occitanie (Vias)', styles:['fun / animations','plaine de jeux / aquapark'], lat:43.31, lng:3.42,
+    desc:"4 espaces aquatiques : toboggans, lagon, bassin zen, piscine couverte.", price:null, rating:null, site:'Domaine de la Dragonnière Vias' },
+  { name:'Camping Floreal La Roche-en-Ardenne', type:'camping', country:'Belgique', region:'Ardennes', styles:['nature / plein air','plaine de jeux / aquapark'], lat:50.18, lng:5.58,
+    desc:"Piscine chauffée et bassin ludique, cadre nature Ardennes.", price:null, rating:null, site:'Floreal La Roche-en-Ardenne camping' },
+  { name:'Camping Goolderheide', type:'camping', country:'Belgique', region:'Limbourg', styles:['fun / animations','activités sportives'], lat:51.10, lng:5.55,
+    desc:"Olympiades, escalade, minigolf, karts électriques, terrain multisports.", price:null, rating:null, site:'Camping Goolderheide Belgique' },
+  { name:'Europarcs Resort Kempen', type:'camping', country:'Belgique', region:'Campine (proche Anvers)', styles:['fun / animations','plaine de jeux / aquapark'], lat:51.25, lng:5.05,
+    desc:"Au bord d'un lac avec toboggan aquatique.", price:null, rating:null, site:'Europarcs Resort Kempen' },
+  { name:'Belambra Clubs La Palmyre-Les Mathes', type:'club vacances', country:'France', region:'Charente-Maritime', styles:['fun / animations'], lat:45.68, lng:-1.13,
+    desc:"Club enfants et spectacles très appréciés, cadre verdoyant.", price:null, rating:null, site:'Belambra Clubs La Palmyre Les Mathes' },
+  { name:"Belambra Clubs La Chambre d'Amour", type:'club vacances', country:'France', region:'Anglet (Pays basque)', styles:['fun / animations','activités sportives'], lat:43.51, lng:-1.53,
+    desc:"Club enfants avec spectacle hebdomadaire, cours de natation encadrés.", price:null, rating:null, site:"Belambra Clubs La Chambre d'Amour Anglet" },
+  { name:'Villages Nature Paris', type:'hôtel', country:'France', region:'Marne-la-Vallée (près Disneyland)', styles:['fun / animations','plaine de jeux / aquapark','zen / détente'], lat:48.87, lng:2.80,
+    desc:"Aqualagon couvert (11 500 m²) avec toboggans et lagon à 30°C, ferme pédagogique, forêt des légendes.", price:null, rating:null, site:'Villages Nature Paris' },
+  { name:'Center Parcs Park de Haan (formule hôtel)', type:'hôtel', country:'Belgique', region:'Côte belge (près Bruges)', styles:['fun / animations','plaine de jeux / aquapark','zen / détente'], lat:51.27, lng:3.03,
+    desc:"Chambres d'hôtel pratiques (rare chez Center Parcs), piscine subtropicale, lac avec plage.", price:null, rating:null, site:'Center Parcs Park de Haan hôtel' },
+  { name:'Kompas Hotel (proche Bellewaerde)', type:'hôtel', country:'Belgique', region:'Ypres', styles:['fun / animations','plaine de jeux / aquapark'], lat:50.81, lng:2.96,
+    desc:"Juste à côté du parc aquatique Bellewaerde (toboggans, aquarium, jeux d'eau).", price:null, rating:null, site:'Kompas Hotel Ieper Bellewaerde' },
+  { name:'Gîtes avec piscine — Ardennes belges', type:'gîte / location', country:'Belgique', region:'Ardennes (Durbuy, Houffalize, Spa)', styles:['nature / plein air','zen / détente','familial'], lat:50.20, lng:5.45,
+    desc:"Réseau de gîtes 8 à 20 personnes avec piscine intérieure/extérieure, jeux, billard.", price:null, rating:null, site:'gîtes avec piscine Ardennes belges' },
+  { name:'VVF Gîtes avec piscine (réseau France)', type:'gîte / location', country:'France', region:'+70 destinations en France', styles:['familial','nature / plein air'], lat:46.6, lng:2.5,
+    desc:"Réseau national de gîtes avec piscine — distance très approximative, dépend de la destination choisie.", price:null, rating:null, site:'VVF gîtes avec piscine' }
+];
+
+const cityCoords = {
+  'Charleroi': [50.4108, 4.4446],
+  'Bruxelles': [50.8503, 4.3517],
+  'Namur': [50.4669, 4.8675],
+  'Mons': [50.4542, 3.9520],
+  'Liège': [50.6326, 5.5797],
+  'Tournai': [50.6071, 3.3893],
+  'Anvers': [51.2194, 4.4025],
+  'Gand': [51.0543, 3.7174],
+  'Lille': [50.6292, 3.0573],
+  'Paris': [48.8566, 2.3522]
+};
+
+function haversineKm(lat1, lng1, lat2, lng2){
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function parseRatingScore(ratingStr){
+  if(!ratingStr) return -1;
+  const m = ratingStr.match(/(\d+[,.]?\d*)\s*\/\s*(\d+)/);
+  if(!m) return -1;
+  return parseFloat(m[1].replace(',', '.')) / parseFloat(m[2]);
+}
+
+function parsePriceValue(priceStr){
+  if(!priceStr) return Infinity;
+  const m = priceStr.match(/(\d[\d\s]*)\s*€/);
+  if(!m) return Infinity;
+  return parseInt(m[1].replace(/\s/g, ''), 10);
+}
+
+function mapsLink(startCity, lat, lng){
+  return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(startCity)}&destination=${lat},${lng}&travelmode=driving`;
+}
+
+function buildLink(item, dateStart, dateEnd, totalPersons){
+  const words = [item.site, dateStart && dateEnd ? `du ${dateStart} au ${dateEnd}` : '', `${totalPersons} personnes`, 'réservation prix'].filter(Boolean).join(' ');
+  return `https://www.google.com/search?q=${encodeURIComponent(words)}`;
+}
+
+let lastCards = []; // mémorise les résultats de la dernière recherche pour le tri manuel
+
+function renderCards(cards){
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+  cards.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'postcard';
+    card.innerHTML = `
+      <div class="pc-type">${item.type}</div>
+      <h3 class="pc-name">${item.name}</h3>
+      <p class="pc-desc">${item.desc}</p>
+      ${item.rating ? `<p class="pc-rating">⭐ ${item.rating}</p>` : ''}
+      ${item.distance ? `<p class="pc-distance">🚗 ${item.distance}</p>` : ''}
+      <p class="pc-note">💶 ${item.price}</p>
+      <div class="pc-links">
+        <a class="pc-link" href="${item.url}" target="_blank" rel="noopener">Voir le prix actuel →</a>
+        ${item.mapsUrl ? `<a class="pc-link pc-link-secondary" href="${item.mapsUrl}" target="_blank" rel="noopener">🗺️ Itinéraire</a>` : ''}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('sortMode').addEventListener('change', (e) => {
+  const mode = e.target.value;
+  const sorted = [...lastCards];
+  if(mode === 'distance'){
+    sorted.sort((a,b) => a.distanceValue - b.distanceValue);
+  } else if(mode === 'rating'){
+    sorted.sort((a,b) => b.ratingScore - a.ratingScore);
+  } else if(mode === 'price'){
+    sorted.sort((a,b) => a.priceValue - b.priceValue);
+  } else {
+    sorted.sort((a,b) => a.relevanceOrder - b.relevanceOrder);
+  }
+  renderCards(sorted);
+});
+
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+document.getElementById('searchForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const errorBox = document.getElementById('error');
+  const resultsBox = document.getElementById('results');
+  errorBox.style.display = 'none';
+
+  const dateStart = document.getElementById('dateStart').value;
+  const dateEnd = document.getElementById('dateEnd').value;
+  const adults = +document.getElementById('adults').value || 2;
+  const budget = document.getElementById('budget').value;
+  const types = [...selectedTypes];
+  const countries = [...selectedCountries];
+  const styles = [...selectedStyles];
+  const kids = defaultKids.slice();
+  const totalPersons = adults + kids.length;
+
+  const startCity = document.getElementById('startCity').value;
+  const maxDistance = +document.getElementById('maxDistance').value || null;
+  const [startLat, startLng] = cityCoords[startCity] || cityCoords['Charleroi'];
+
+  // Calcul de la distance approximative (vol d'oiseau x1.3) pour chaque destination
+  const withDistance = destinations.map(d => ({
+    ...d,
+    distanceKm: Math.round(haversineKm(startLat, startLng, d.lat, d.lng) * 1.3)
+  }));
+
+  // Filtre dur : type, pays et distance max si renseignés
+  let matches = withDistance.filter(d =>
+    (!types.length || types.includes(d.type)) &&
+    (!countries.length || countries.includes(d.country)) &&
+    (!maxDistance || d.distanceKm <= maxDistance)
+  );
+
+  // Tri par défaut (pertinence) : style demandé en priorité, puis distance croissante
+  matches.sort((a,b) => {
+    const aMatch = styles.length && a.styles.some(s => styles.includes(s)) ? 1 : 0;
+    const bMatch = styles.length && b.styles.some(s => styles.includes(s)) ? 1 : 0;
+    if(aMatch !== bMatch) return bMatch - aMatch;
+    return a.distanceKm - b.distanceKm;
+  });
+
+  let cards = matches.slice(0, 30).map((item, i) => ({
+    name: item.name,
+    type: `${item.type} · ${item.region}, ${item.country}`,
+    desc: item.desc,
+    rating: item.rating,
+    ratingScore: parseRatingScore(item.rating),
+    distance: `≈ ${item.distanceKm} km depuis ${startCity}`,
+    distanceValue: item.distanceKm,
+    price: item.price || 'Prix à vérifier sur le site (variable selon dates)',
+    priceValue: parsePriceValue(item.price),
+    relevanceOrder: i,
+    url: buildLink(item, dateStart, dateEnd, totalPersons),
+    mapsUrl: mapsLink(startCity, item.lat, item.lng)
+  }));
+
+  // Complément si moins de 30 résultats après filtrage : liens de recherche généraux
+  if(cards.length < 30){
+    const destination = countries.length ? countries.join(' ') : 'Europe';
+    const typeLabel = types.length ? types.join(' ') : 'vacances famille';
+    const styleLabel = styles.length ? styles.join(' ') : '';
+    const bkParams = new URLSearchParams();
+    bkParams.set('ss', `${typeLabel} ${destination}`.trim());
+    if(dateStart) bkParams.set('checkin', dateStart);
+    if(dateEnd) bkParams.set('checkout', dateEnd);
+    bkParams.set('group_adults', adults);
+    bkParams.set('group_children', kids.length);
+    kids.forEach(age => bkParams.append('age', age));
+    const fillers = [
+      { name:'Booking.com', type:'Recherche générale · Hôtels, campings, résidences', desc:'Recherche pré-remplie avec vos dates et votre groupe.', rating:null, ratingScore:-1, distance:null, distanceValue:Infinity, price:'Prix affichés en direct sur le site', priceValue:Infinity, relevanceOrder:99, url:`https://www.booking.com/searchresults.html?${bkParams.toString()}`, mapsUrl:null },
+      { name:'Recherche Google élargie', type:'Recherche générale · Toutes options', desc:'Combine tous vos critères en une requête.', rating:null, ratingScore:-1, distance:null, distanceValue:Infinity, price:'—', priceValue:Infinity, relevanceOrder:100, url:`https://www.google.com/search?q=${encodeURIComponent([typeLabel, styleLabel, destination, 'famille', `${totalPersons} personnes`, dateStart && dateEnd ? `${dateStart} au ${dateEnd}` : '', budget ? `budget ${budget}€` : ''].filter(Boolean).join(' '))}`, mapsUrl:null }
+    ];
+    while(cards.length < 30 && fillers.length){
+      cards.push(fillers.shift());
+    }
+  }
+
+  lastCards = cards;
+  document.getElementById('sortMode').value = 'relevance';
+  renderCards(cards);
+
+  if(matches.length === 0){
+    errorBox.textContent = "Aucune destination de la base ne correspond à ces critères (distance max trop courte, ou combinaison type/pays trop restrictive). Essayez d'élargir la distance ou les filtres.";
+    errorBox.style.display = 'block';
+  }
+
+  resultsBox.style.display = 'block';
+  resultsBox.scrollIntoView({behavior:'smooth', block:'start'});
+});
+</script>
+
+</body>
+</html>
